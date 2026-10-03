@@ -1,0 +1,183 @@
+{
+  "name": "Leadgen_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/enrich",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        192
+      ],
+      "id": "a10674c1-99c3-4a94-b992-32ebdd4cb1d9",
+      "name": "Enrich HTTP Request"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09TPDNMZKQ",
+          "mode": "list",
+          "cachedResultName": "leadgen-approvals"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"🧠 *New Comment Suggestions For Approval!*\"\n      }\n    },\n\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Post:* <{{ $json.results[0].post_url }}|click here to read the post>\"\n      }\n    },\n\n    { \"type\": \"divider\" },\n\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*💬 Select ONE comment:*\"\n      }\n    },\n\n    {\n      \"type\": \"actions\",\n      \"block_id\": \"wTF4f\",\n      \"elements\": [\n        {\n          \"type\": \"radio_buttons\",\n          \"action_id\": \"comment_choice\",\n          \"options\": [\n            {\n              \"text\": {\n                \"type\": \"plain_text\",\n                \"text\": \"{{ $json.results[0].comment_options[0] }}\",\n                \"emoji\": true\n              },\n              \"value\": \"1\"\n            },\n            {\n              \"text\": {\n                \"type\": \"plain_text\",\n                \"text\": \"{{ $json.results[0].comment_options[1] }}\",\n                \"emoji\": true\n              },\n              \"value\": \"2\"\n            },\n            {\n              \"text\": {\n                \"type\": \"plain_text\",\n                \"text\": \"{{ $json.results[0].comment_options[2] }}\",\n                \"emoji\": true\n              },\n              \"value\": \"3\"\n            }\n          ]\n        }\n      ]\n    },\n\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*🔥 Select ONE reaction:*\"\n      }\n    },\n\n    {\n      \"type\": \"actions\",\n      \"block_id\": \"ELF6X\",\n      \"elements\": [\n        {\n          \"type\": \"radio_buttons\",\n          \"action_id\": \"reaction_choice\",\n          \"options\": [\n            {\n              \"text\": {\n                \"type\": \"plain_text\",\n                \"text\": \"{{ $json.results[0].reactions[0].emoji }}\",\n                \"emoji\": true\n              },\n              \"value\": \"{{ $json.results[0].reactions[0].code }}\"\n            },\n            {\n              \"text\": {\n                \"type\": \"plain_text\",\n                \"text\": \"{{ $json.results[0].reactions[1].emoji }}\",\n                \"emoji\": true\n              },\n              \"value\": \"{{ $json.results[0].reactions[1].code }}\"\n            }\n          ]\n        }\n      ]\n    },\n\n    { \"type\": \"divider\" },\n\n    {\n      \"type\": \"actions\",\n      \"elements\": [\n        {\n          \"type\": \"button\",\n          \"action_id\": \"approve_button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"Approve\",\n            \"emoji\": true\n          },\n          \"value\": \"{{ 'approve_' + $json.results[0].post_id }}\"\n        },\n        {\n          \"type\": \"button\",\n          \"action_id\": \"decline_button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"Decline\",\n            \"emoji\": true\n          },\n          \"value\": \"{{ 'decline_' + $json.results[0].post_id }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "otherOptions": {
+          "unfurl_links": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "1cf15abb-d480-40aa-b4a5-55b584ca4fe3",
+      "name": "Send a message",
+      "webhookId": "0acf7a42-a06a-45d4-a5e3-df09e5054873",
+      "notesInFlow": false,
+      "credentials": {
+        "slackApi": {
+          "id": "HTTCaDKy6M2nfIOO",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/outreach/4003",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        192
+      ],
+      "id": "3876ce66-d3c9-4915-960c-c2bffce9e76f",
+      "name": "Outreach HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/api/leads/warm",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        432,
+        192
+      ],
+      "id": "afd5cfb1-706e-45ec-b96e-13c454bbb7ad",
+      "name": "Warm Lead HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/write",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": " {\"limit\": 5}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "d147d78e-e163-4da1-96ec-15eacd2e9231",
+      "name": "Write HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/listen_linkedin",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"identifier\": \"vyaspratik\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -320,
+        16
+      ],
+      "id": "28bc68b8-76c1-414b-b2fe-4f3b9b2fcead",
+      "name": "Listen HTTP Request",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Enrich HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Outreach HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outreach HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Warm Lead HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listen HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Write HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Enrich HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aa87a2eb-4bd8-4fd4-b49d-d21f2d7bb4d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "99b2a44f0c0a4f4b93091a620de233dee7b2e193d68b4d49dafaed7d274faa63"
+  },
+  "nodeGroups": [],
+  "id": "w9NNeNexyiPpHJDZ",
+  "tags": []
+}
